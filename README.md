@@ -5,7 +5,7 @@ Utilizing Machine Learning (ML) algorithms and OpenCV, our Vehicle Number Plate 
 
 ### Screenshot of plate scanning image 
 
-![Screenshot of the web page scanning number plate](https://github.com/anuragaryanyt/number_plate_detection/blob/main/ss/WhatsApp%20Image%202024-03-15%20at%2020.04.52_22d68137.jpg?raw=true)
+![Screenshot of the web page scanning number plate](https://raw.githubusercontent.com/anuragaryanyt/number_plate_detection/main/ss/Screenshot%20from%202024-03-18%2002-31-24-1.png)
 
 ### Scanned image result
 
