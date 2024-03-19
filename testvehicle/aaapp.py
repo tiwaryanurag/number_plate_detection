@@ -53,7 +53,6 @@ vehicle_database = load_vehicle_database()
 #     print("-" * 20)
 #     print("-" * 20)
 
-
 # List to store recognized license plate information
 recognized_plates = []
 
