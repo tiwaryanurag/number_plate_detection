@@ -5,19 +5,19 @@ from datetime import datetime, timedelta, timezone
 import pytesseract
 import requests
 from PIL import Image
-from flask import Flask, jsonify, redirect, render_template, Response, request, url_for
+from flask import Flask, jsonify, redirect, render_template, Response, request, session, url_for
 import threading
 from pymongo import MongoClient
 
 app = Flask(__name__)
 
 # Connect to local host MongoDB
-# client = MongoClient('mongodb://localhost:27017/')
-# db= client.vehicle
-# db = client['vehicle'] #database 
 
-client = MongoClient("mongodb+srv://vehicle:1234@atlascluster.uczqi01.mongodb.net/")
-db = client['vehicle_database']
+client = MongoClient('mongodb://localhost:27017/')
+db= client.vehicle
+
+# client = MongoClient("mongodb+srv://vehicle:1234@atlascluster.uczqi01.mongodb.net/")
+# db = client['vehicle_database']
 
 vehicles_collection = db['vehicle']  #collection name
 history_collection = db['history'] #collection name
@@ -155,13 +155,39 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-@app.route('/recognized_plates')
-def recognized_plates_page():
-    return render_template('recognized_plates.html', recognized_plates=recognized_plates)
+#login function
+app.secret_key = 'admin'  # Add a secret key for session management
+
+# Define admin credentials
+ADMIN_USERNAME = 'admin'
+ADMIN_PASSWORD = 'admin'
+
+# Add a login route
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['logged_in'] = True  # Set session variable indicating user is logged in
+            return redirect(url_for('index'))  # Redirect to index.html
+        else:
+            return render_template('login.html', error=True)
+    else:
+        return render_template('login.html', error=False)
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)  # Clear session variable
+    return redirect(url_for('index'))
 
 
 @app.route('/add_vehicle', methods=['POST'])
 def add_vehicle():
+
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))  # Redirect to login page if not logged in
+
     plate_number = request.form['plate_number']
     owner_name = request.form['owner_name']
     make = request.form['make']
@@ -177,11 +203,15 @@ def add_vehicle():
         "model": model,
         "color": color
     })
-
     return redirect(url_for('index'))
 
 
-@app.route('/')
+@app.route('/recognized_plates')
+def recognized_plates_page():
+    return render_template('recognized_plates.html', recognized_plates=recognized_plates)
+
+
+@app.route('/index')
 def index():
 
     try:
